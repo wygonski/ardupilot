@@ -1,4 +1,4 @@
-// User specific config file.  Any items listed in config.h can be overridden here.
+//  User specific config file.  Any items listed in config.h can be overridden here.
 
 // If you used to define your CONFIG_APM_HARDWARE setting here, it is no longer
 // valid! You should switch to using a HAL_BOARD flag in your local config.mk.
