@@ -139,6 +139,10 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
 #if GRIPPER_ENABLED == ENABLED
     SCHED_TASK(gripper_update,        10,     75),
 #endif
+
+    // JJW added:
+    SCHED_TASK(scalarMagTask, 10, 350),
+    // JJW end
 #ifdef USERHOOK_FASTLOOP
     SCHED_TASK(userhook_FastLoop,    100,     75),
 #endif

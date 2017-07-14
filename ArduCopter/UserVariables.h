@@ -3,7 +3,8 @@
 // example variables used in Wii camera testing - replace with your own
 // variables
 #ifdef USERHOOK_VARIABLES
-
+// JJW added:
+int UserCount=0;
 #if WII_CAMERA == 1
 WiiCamera           ircam;
 int                 WiiRange=0;
