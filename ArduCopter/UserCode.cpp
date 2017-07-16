@@ -1,4 +1,22 @@
 #include "Copter.h"
+
+#include <AP_ScalarMag/AP_ScalarMag.h>
+
+ScalarMag scalarMag;
+
+/*// Write a ScalarMag packet
+static void Log_Write_ScalarMag()
+{
+    struct log_ScalarMag pkt = {
+        LOG_PACKET_HEADER_INIT(LOG_SCALARMAG_MSG),
+        val1              : scalarMag.MagData,
+        val2              : scalarMag.signalStrength,
+        val3              : scalarMag.cycleCount
+    };
+    DataFlash.WriteBlock(&pkt, sizeof(pkt));
+}*/
+
+
 /*
   setup one UART at 57600
  */
@@ -25,15 +43,16 @@ void Copter::userhook_init()
 {
     // put your initialisation code here
     // this will be called once at start-up
-    // this will be called once at start-up
     setup_uart(hal.uartD, "uartD");  // telemetry 2
     UserCount=0;}
+
+    //scalarMag.init();
+
 #endif
 
 void Copter::scalarMagTask()
 {
-    // put your 1Hz code here
-    hal.console->printf("\r\n>>>>MSG from scheduled task, count %d\r\n ", UserCount++);
+    hal.console->printf("\r\n>>MSG count %d\r\n ", UserCount++);
     test_uart(hal.uartD, "uartD");  // telemetry2
 }
 
@@ -56,6 +75,17 @@ void Copter::userhook_50Hz()
 void Copter::userhook_MediumLoop()
 {
     // put your 10Hz code here
+    if(scalarMag.healthy){
+        if ( scalarMag.read() ) {
+            hal.console->printf("magData %d\r\n", scalarMag.magData);
+            // Log_Write_ScalarMag();
+        }
+    }
+    /*
+    else
+        ScalarMag.init();
+    */
+
 }
 #endif
 
