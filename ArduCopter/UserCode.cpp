@@ -1,6 +1,7 @@
 #include "Copter.h"
 
-#include <AP_ScalarMag/AP_ScalarMag.h>
+//#include <AP_ScalarMag/AP_ScalarMag.h>
+#include "AP_ScalarMag.h"
 
 ScalarMag scalarMag;
 
@@ -35,7 +36,7 @@ static void test_uart(AP_HAL::UARTDriver *uart, const char *name)
         // that UART doesn't exist on this platform
         return;
     }
-    uart->printf("\r\n>>>4>>>MSG from %s at %.3f s\n",
+    uart->printf("\r\n>>>4>>>ScalarMag %s at %.3f s\n",
                  name, (double)(AP_HAL::millis() * 0.001f));
 }
 #ifdef USERHOOK_INIT
@@ -52,8 +53,9 @@ void Copter::userhook_init()
 
 void Copter::scalarMagTask()
 {
-    hal.console->printf("\r\n>>MSG count %d\r\n ", UserCount++);
+    hal.console->printf("\r\n>>ScalarMag count %d\r\n ", UserCount++);
     test_uart(hal.uartD, "uartD");  // telemetry2
+    // Log_Write_ScalarMag();
 }
 
 
@@ -100,7 +102,6 @@ void Copter::userhook_SlowLoop()
 void Copter::userhook_SuperSlowLoop()
 {
     // put your 1Hz code here
-    hal.console->printf("\r\n>>1>>MSG count %d\r\n ", UserCount++);
-    test_uart(hal.uartD, "uartD");  // telemetry2
+    hal.console->printf("\r\n>> 1 Hz loop >>MSG count %d\r\n ", UserCount++);
 }
 #endif

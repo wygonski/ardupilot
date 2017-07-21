@@ -864,6 +864,13 @@ struct PACKED log_Beacon {
 #define BARO_LABELS "TimeUS,Alt,Press,Temp,CRt,SMS,Offset,GndTemp"
 #define BARO_FMT   "QffcfIff"
 
+// JJW added
+// see "struct sensor" in AP_ScalarMag.h and "Log_Write_ScalarMag":
+#define SCALARMAG_LABELS "TimeUS,MagData,SignalStrength,DspCycleCount"
+// TODO check format string for scalar
+#define SCALARMAG_FMT   "QffcfIff"
+// end
+
 #define ESC_LABELS "TimeUS,RPM,Volt,Curr,Temp"
 #define ESC_FMT   "Qcccc"
 

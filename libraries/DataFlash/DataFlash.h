@@ -10,7 +10,13 @@
 #include <AP_InertialSensor/AP_InertialSensor.h>
 #include <AP_RSSI/AP_RSSI.h>
 #include <AP_Baro/AP_Baro.h>
+#include <AP_Baro/AP_Baro.h>
 #include <AP_AHRS/AP_AHRS.h>
+// JJW added
+#include <AP_ScalarMag.h>
+/// TODO Maybe the following #include is what causes the copy of ScalarMag from "libraries" to be included
+#// #include <AP_ScalarMag/AP_ScalarMag.h>
+/// end
 #include <AP_Vehicle/AP_Vehicle.h>
 #include <AP_Mission/AP_Mission.h>
 #include <AP_Airspeed/AP_Airspeed.h>
@@ -119,6 +125,9 @@ public:
     void Log_Write_RCOUT(void);
     void Log_Write_RSSI(AP_RSSI &rssi);
     void Log_Write_Baro(AP_Baro &baro, uint64_t time_us=0);
+    // JJW added
+    void Log_Write_ScalarMag(ScalarMag &scalarMag, uint64_t time_us=0);
+    // JJW end
     void Log_Write_Power(void);
     void Log_Write_AHRS2(AP_AHRS &ahrs);
     void Log_Write_POS(AP_AHRS &ahrs);

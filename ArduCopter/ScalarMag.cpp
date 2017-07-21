@@ -22,10 +22,20 @@
 // AVR LibC Includes
 #include <inttypes.h>
 
-#include <AP_HAL.h>
+#include <AP_HAL/AP_HAL.h>
 #include "ScalarMag.h"
 
 extern const AP_HAL::HAL& hal;
+
+// Private Methods ///////////////////////////////////////////////////////////////
+void _updates(bool state) {
+    if (state) {
+        // _sendCommand("\"");
+    }
+    else {
+        // _sendCommand("!");
+    }
+}
 
 // Public Methods //////////////////////////////////////////////////////////////
 bool ScalarMag::read()
@@ -51,42 +61,35 @@ bool ScalarMag::init()
 {
     uint8_t buff[24];
 
-	_updates(false);
+	this->updates(false);
 	// psuedocode:
 	// _SendCommandForStringResult("png");
 	// if (_stringResult == "OK") {  healthy = true;  }
 	// else {  healthy = false }
 	healthy = true;
 	
-	_updates(true);
+	this->updates(true);
     return true;
 }
 
-bool			updates(bool state) {
+bool updates(bool state) {
     _updates(state);
     return (true);
 }
 	
-bool			serialNumber() {
+bool serialNumber() {
 	return false;
 }
 	
-bool			sensorDescription() {
+bool sensorDescription() {
 	return false;
 }
 	
-bool			firmwareRevision() {
+bool firmwareRevision() {
 	return false;
 }
 
-void _updates(bool state) {
-	if (state) { 
-		// _sendCommand("\");  
-	}
-	else { 
-		// _sendCommand("!"); 
-	}
-}
+
 
 
 
