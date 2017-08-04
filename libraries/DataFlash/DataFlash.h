@@ -13,9 +13,9 @@
 #include <AP_Baro/AP_Baro.h>
 #include <AP_AHRS/AP_AHRS.h>
 // JJW added
-#include <AP_ScalarMag.h>
+//#include <AP_ScalarMag.h>
 /// TODO Maybe the following #include is what causes the copy of ScalarMag from "libraries" to be included
-#// #include <AP_ScalarMag/AP_ScalarMag.h>
+#include <AP_ScalarMag/AP_ScalarMag.h>
 /// end
 #include <AP_Vehicle/AP_Vehicle.h>
 #include <AP_Mission/AP_Mission.h>

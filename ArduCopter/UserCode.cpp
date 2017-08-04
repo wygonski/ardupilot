@@ -1,7 +1,7 @@
 #include "Copter.h"
 
-//#include <AP_ScalarMag/AP_ScalarMag.h>
-#include "AP_ScalarMag.h"
+#include <AP_ScalarMag/AP_ScalarMag.h>
+//#include "AP_ScalarMag.h"
 
 ScalarMag scalarMag;
 
