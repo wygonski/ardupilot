@@ -126,7 +126,7 @@ public:
     void Log_Write_RSSI(AP_RSSI &rssi);
     void Log_Write_Baro(AP_Baro &baro, uint64_t time_us=0);
     // JJW added
-    void Log_Write_ScalarMag(ScalarMag &scalarMag, uint64_t time_us=0);
+    void Log_Write_ScalarMag(AP_ScalarMag &scalarMag, uint64_t time_us=0);
     // JJW end
     void Log_Write_Power(void);
     void Log_Write_AHRS2(AP_AHRS &ahrs);

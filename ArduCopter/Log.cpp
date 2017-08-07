@@ -578,6 +578,12 @@ void Copter::Log_Write_Baro(void)
     }
 }
 
+
+void Copter::Log_Write_ScalarMag(void)
+{
+     DataFlash.Log_Write_ScalarMag(scalarMag);
+}
+
 struct PACKED log_ParameterTuning {
     LOG_PACKET_HEADER;
     uint64_t time_us;

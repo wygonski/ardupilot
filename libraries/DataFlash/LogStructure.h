@@ -195,6 +195,15 @@ struct PACKED log_BARO {
     float   ground_temp;
 };
 
+struct PACKED log_SCALARMAG {
+    LOG_PACKET_HEADER;
+    uint64_t time_us;
+    char     rawMagData[64];
+    uint32_t magData;
+    uint16_t signalStrength;
+    uint32_t cycleCounter;
+};
+
 struct PACKED log_AHRS {
     LOG_PACKET_HEADER;
     uint64_t time_us;
@@ -866,9 +875,10 @@ struct PACKED log_Beacon {
 
 // JJW added
 // see "struct sensor" in AP_ScalarMag.h and "Log_Write_ScalarMag":
-#define SCALARMAG_LABELS "TimeUS,MagData,SignalStrength,DspCycleCount"
-// TODO check format string for scalar
-#define SCALARMAG_FMT   "QffcfIff"
+// want: #define SCALARMAG_LABELS "TimeUS,rawMagData,MagData,SignalStrength,DspCycleCount,Roll,Pitch,Yaw"
+// Later we can replace (or keep) raw !<p1>#<p2>^<p3>CRLF string with uint32_t, uint32_t, uint32_t when we put in parsing of string
+#define SCALARMAG_LABELS "TimeUS,stringMagData,Roll,Pitch,Yaw"
+#define SCALARMAG_FMT   "QZccC"
 // end
 
 #define ESC_LABELS "TimeUS,RPM,Volt,Curr,Temp"
@@ -958,6 +968,8 @@ Format characters in the format string for binary log messages
       "RSSI",  "Qf",     "TimeUS,RXRSSI" }, \
     { LOG_BARO_MSG, sizeof(log_BARO), \
       "BARO",  BARO_FMT, BARO_LABELS }, \
+    { LOG_SCALARMAG_MSG, sizeof(log_SCALARMAG), \
+      "QMAG",  SCALARMAG_FMT, SCALARMAG_LABELS }, \
     { LOG_POWR_MSG, sizeof(log_POWR), \
       "POWR","QffH","TimeUS,Vcc,VServo,Flags" },  \
     { LOG_CMD_MSG, sizeof(log_Cmd), \
@@ -1281,6 +1293,7 @@ enum LogMessages {
     LOG_VISUALODOM_MSG,
     LOG_AOA_SSA_MSG,
     LOG_BEACON_MSG,
+    LOG_SCALARMAG_MSG,
 };
 
 enum LogOriginType {

@@ -41,6 +41,7 @@
 #include <DataFlash/DataFlash.h>          // ArduPilot Mega Flash Memory Library
 #include <AP_ADC/AP_ADC.h>             // ArduPilot Mega Analog to Digital Converter Library
 #include <AP_Baro/AP_Baro.h>
+#include <AP_ScalarMag/AP_ScalarMag.h>  // JJW ScalarMag
 #include <AP_Compass/AP_Compass.h>         // ArduPilot Mega Magnetometer Library
 #include <AP_Math/AP_Math.h>            // ArduPilot Mega Vector/Matrix math Library
 #include <AP_AccelCal/AP_AccelCal.h>                // interface and maths for accelerometer calibration
@@ -200,6 +201,8 @@ private:
     AP_Int8 *flight_modes;
 
     AP_Baro barometer;
+    // JJW added
+    AP_ScalarMag scalarMag;
     Compass compass;
     AP_InertialSensor ins;
 

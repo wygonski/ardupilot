@@ -414,6 +414,28 @@ void DataFlash_Class::Log_Write_Baro(AP_Baro &baro, uint64_t time_us)
     }
 }
 
+// Write a SCALARMAG packet
+void DataFlash_Class::Log_Write_ScalarMag(AP_ScalarMag &scalarMag, uint64_t time_us)
+{
+    if (time_us == 0) {
+        time_us = AP_HAL::micros64();
+    }
+    //uint32_t magData = scalarMag.getMagData();
+    //uint16_t signalStrength = scalarMag.getSignalStrength();
+    //uint32_t cycleCounter = scalarMag.getCycleCounter();
+    struct log_SCALARMAG pkt = {
+        LOG_PACKET_HEADER_INIT(LOG_SCALARMAG_MSG),
+        time_us       : time_us,
+        rawMagData      : { },
+        magData         : scalarMag.getMagData(),
+        signalStrength  : scalarMag.getSignalStrength(),
+        cycleCounter    : scalarMag.getCycleCounter(),
+    };
+    // example init is from log_message
+    strncpy(pkt.rawMagData, scalarMag.tfmSensor.rawMagData, sizeof(pkt.rawMagData));
+    WriteBlock(&pkt, sizeof(pkt));
+}
+
 // Write an raw accel/gyro data packet
 void DataFlash_Class::Log_Write_IMU(const AP_InertialSensor &ins)
 {

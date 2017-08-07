@@ -141,7 +141,7 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
 #endif
 
     // JJW added:
-    SCHED_TASK(scalarMagTask, 10, 350),
+    SCHED_TASK(scalarMagTask, 10, 350), // 10Hz=100ms, max exec time is 350uS
     // JJW end
 #ifdef USERHOOK_FASTLOOP
     SCHED_TASK(userhook_FastLoop,    100,     75),

@@ -14,8 +14,8 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 /*
- *       ScalarMag.cpp - QuSpin TFM sensor class
- *       Sensor is connected to UART port (which one?)
+ *       AP_ScalarMag.cpp - QuSpin TFM sensor class
+ *       Sensor is connected to PixHawk port Serial 4
  *
  */
 
@@ -23,7 +23,7 @@
 #include <inttypes.h>
 
 #include <AP_HAL/AP_HAL.h>
-#include "ScalarMag.h"
+#include <AP_ScalarMag/AP_ScalarMag.h>
 
 extern const AP_HAL::HAL& hal;
 
@@ -38,7 +38,7 @@ void _updates(bool state) {
 }
 
 // Public Methods //////////////////////////////////////////////////////////////
-bool ScalarMag::read()
+bool AP_ScalarMag::read(void)
 {
 	bool retVal = false;
 	
@@ -49,7 +49,7 @@ bool ScalarMag::read()
 
 	return retVal;
 }
-bool ScalarMag::readSimulated() {
+bool AP_ScalarMag::readSimulated(void) {
 	
 	// quick and dirty periodic function
 	magData = (magData +2) % 4000;
@@ -57,9 +57,11 @@ bool ScalarMag::readSimulated() {
 	return true;
 }
 
-bool ScalarMag::init()
+bool AP_ScalarMag::init(void)
 {
     uint8_t buff[24];
+
+    pktReceived = false;
 
 	this->updates(false);
 	// psuedocode:
