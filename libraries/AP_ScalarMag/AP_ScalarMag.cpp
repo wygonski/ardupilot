@@ -37,6 +37,14 @@ void _updates(bool state) {
     }
 }
 
+/*
+  AP_ScalarMag constructor
+ */
+AP_ScalarMag::AP_ScalarMag()
+{
+    AP_Param::setup_object_defaults(this, var_info);
+}
+
 // Public Methods //////////////////////////////////////////////////////////////
 bool AP_ScalarMag::read(void)
 {
