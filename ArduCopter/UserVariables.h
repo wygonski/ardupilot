@@ -5,6 +5,7 @@
 #ifdef USERHOOK_VARIABLES
 // JJW added:
 int UserCount=0;
+bool bFirstTime = true;
 uint8_t    receivedBytes[64];
 #if WII_CAMERA == 1
 WiiCamera           ircam;

@@ -28,9 +28,6 @@ void Copter::Log_Write_ScalarMag(AP_ScalarMag &sm, uint64_t time_us)
     if (time_us == 0) {
         time_us = AP_HAL::micros64();
     }
-    //uint32_t magData = scalarMag.getMagData();
-    //uint16_t signalStrength = scalarMag.getSignalStrength();
-    //uint32_t cycleCounter = scalarMag.getCycleCounter();
     struct log_SCALARMAG pkt = {
         LOG_PACKET_HEADER_INIT(LOG_SCALARMAG_MSG),
         time_us       : time_us,
@@ -71,6 +68,7 @@ static void scalarSetupUart(AP_HAL::UARTDriver *uart, int32_t baudRate)
         return;
     }
     uart->begin(baudRate);
+    uart->flush();   // likely just waits for serial Tx to finish, if any
 }
 
 static void test_uart(AP_HAL::UARTDriver *uart, const char *name)
@@ -89,21 +87,26 @@ void Copter::userhook_init()
     // this will be called once at start-up
     setup_uart(hal.uartC, "uartC");  // uartC is TELEM1
 //    setup_uart(hal.uartD, "uartD");  // uartD is TELEM2
+    // set up to read scalarMag on serial 4
     scalarSetupUart(hal.uartE, 115200);  // PixHawk Serial 4
+    hal.console->printf("\r\n>>scalarSetupUart()-- DONE\r\n ");  // to MP Terminal
     //setup_uart(hal.uartF, "uartF");  // is *not* Serial 5
     UserCount=0;
 
     // JJW
     scalarMag.init();
-    // set up to read scalarMag on serial 4
+    bFirstTime = true;
+    hal.console->printf("\r\n>>scalarMag.init()-- DONE\r\n ");  // to MP Terminal
 }
-
-
-
 #endif
 
 void Copter::scalarMagTask()
 {
+    if (bFirstTime) {
+        bFirstTime = false;
+        while (hal.uartE->available()) { hal.uartE->read();}  // clears Rx buffer
+        return;
+    }
     // read bytes from scalarMag on PixHawk
     // scalarMag::read()
     uint32_t nBytes = hal.uartE->available();
@@ -116,7 +119,7 @@ void Copter::scalarMagTask()
             scalarMag.tfmSensor.rawMagData[i] = dataByte;
             receivedBytes[i] = dataByte;
             // echo bytes over radio link
-            hal.uartC->write(dataByte);
+            hal.uartC->write(dataByte); // uartC is TELEM1
             if (dataByte == '\n') {
                 Log_Write_ScalarMag(scalarMag,0);
                 break;
@@ -126,10 +129,6 @@ void Copter::scalarMagTask()
     hal.console->printf("\r\n>>ScalarMag read %d bytes\r\n ", nBytes);  // to MP Terminal
     //hal.console->printf("\r\n>>ScalarMag count %d\r\n ", UserCount++);  // to MP Terminal
     //test_uart(hal.uartD, "uartD");  // telem2 is 915MHz radio to base at 57600
-    //hal.uartC->printf("\r\n>>>>scalarMagTask at %.3f s over %s \n", (double)(AP_HAL::millis() * 0.001f), "uartC");
-    //hal.uartD->printf("\r\n>>>>scalarMagTask at %.3f s over %s \n", (double)(AP_HAL::millis() * 0.001f), "uartD");
-
-    // JJW Log_Write_ScalarMag();
 }
 
 
@@ -176,6 +175,6 @@ void Copter::userhook_SlowLoop()
 void Copter::userhook_SuperSlowLoop()
 {
     // put your 1Hz code here
-    hal.console->printf("\r\n>>ScalarMag (userhook) count %d\r\n ", UserCount++);  // to MP Terminal
+    //hal.console->printf("\r\n>>ScalarMag (userhook) count %d\r\n ", UserCount++);  // to MP Terminal
 }
 #endif
