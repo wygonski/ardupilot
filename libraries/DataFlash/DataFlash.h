@@ -13,9 +13,8 @@
 #include <AP_Baro/AP_Baro.h>
 #include <AP_AHRS/AP_AHRS.h>
 // JJW added
-//#include <AP_ScalarMag.h>
 /// TODO Maybe the following #include is what causes the copy of ScalarMag from "libraries" to be included
-#include <AP_ScalarMag/AP_ScalarMag.h>
+//#include <AP_ScalarMag/AP_ScalarMag.h>
 /// end
 #include <AP_Vehicle/AP_Vehicle.h>
 #include <AP_Mission/AP_Mission.h>
@@ -126,7 +125,8 @@ public:
     void Log_Write_RSSI(AP_RSSI &rssi);
     void Log_Write_Baro(AP_Baro &baro, uint64_t time_us=0);
     // JJW added
-    void Log_Write_ScalarMag(AP_ScalarMag &scalarMag, uint64_t time_us=0);
+    // JJW removed this declaration because it'n no longer part of the DataFlash class
+    // void Log_Write_ScalarMag(AP_ScalarMag &scalarMag, uint64_t time_us=0);
     // JJW end
     void Log_Write_Power(void);
     void Log_Write_AHRS2(AP_AHRS &ahrs);

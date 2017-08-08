@@ -414,7 +414,8 @@ void DataFlash_Class::Log_Write_Baro(AP_Baro &baro, uint64_t time_us)
     }
 }
 
-// Write a SCALARMAG packet
+/* JJW implementation moved to UserCode.cpp
+// JJW Write a SCALARMAG packet
 void DataFlash_Class::Log_Write_ScalarMag(AP_ScalarMag &scalarMag, uint64_t time_us)
 {
     if (time_us == 0) {
@@ -435,6 +436,7 @@ void DataFlash_Class::Log_Write_ScalarMag(AP_ScalarMag &scalarMag, uint64_t time
     strncpy(pkt.rawMagData, scalarMag.tfmSensor.rawMagData, sizeof(pkt.rawMagData));
     WriteBlock(&pkt, sizeof(pkt));
 }
+*/
 
 // Write an raw accel/gyro data packet
 void DataFlash_Class::Log_Write_IMU(const AP_InertialSensor &ins)

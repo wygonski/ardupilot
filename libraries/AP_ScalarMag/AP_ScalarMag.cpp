@@ -42,7 +42,7 @@ void _updates(bool state) {
  */
 AP_ScalarMag::AP_ScalarMag()
 {
-    AP_Param::setup_object_defaults(this, var_info);
+    //AP_Param::setup_object_defaults(this, var_info);
 }
 
 // Public Methods //////////////////////////////////////////////////////////////
@@ -60,7 +60,7 @@ bool AP_ScalarMag::read(void)
 bool AP_ScalarMag::readSimulated(void) {
 	
 	// quick and dirty periodic function
-	magData = (magData +2) % 4000;
+	//magData = (magData +2) % 4000;
 	
 	return true;
 }
@@ -82,20 +82,20 @@ bool AP_ScalarMag::init(void)
     return true;
 }
 
-bool updates(bool state) {
+bool AP_ScalarMag::updates(bool state) {
     _updates(state);
     return (true);
 }
 	
-bool serialNumber() {
+bool AP_ScalarMag::serialNumber() {
 	return false;
 }
 	
-bool sensorDescription() {
+bool AP_ScalarMag::sensorDescription() {
 	return false;
 }
 	
-bool firmwareRevision() {
+bool AP_ScalarMag::firmwareRevision() {
 	return false;
 }
 

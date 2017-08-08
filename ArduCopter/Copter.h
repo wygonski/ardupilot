@@ -746,6 +746,7 @@ private:
     void Log_Write_Error(uint8_t sub_system, uint8_t error_code);
     void Log_Write_Baro(void);
     // JJW added
+    // removed, now a static function in UserCode
     void Log_Write_ScalarMag(void);
     // JJW end
     void Log_Write_Parameter_Tuning(uint8_t param, float tuning_val, int16_t control_in, int16_t tune_low, int16_t tune_high);
@@ -772,6 +773,7 @@ private:
     void userhook_SuperSlowLoop();
     // JJW added:
     void scalarMagTask();
+    void Log_Write_ScalarMag(AP_ScalarMag &scalarMag, uint64_t time_us);
     // end
     void update_home_from_EKF();
     void set_home_to_current_location_inflight();

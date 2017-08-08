@@ -1,4 +1,5 @@
 #include "Copter.h"
+#include <DataFlash/DataFlash.h>          // ArduPilot Mega Flash Memory Library
 
 #include <AP_ScalarMag/AP_ScalarMag.h>
 
@@ -16,6 +17,39 @@ static void Log_Write_ScalarMag()
     };
     DataFlash.WriteBlock(&pkt, sizeof(pkt));
 }*/
+
+
+// Write a SCALARMAG packet
+// Moved here from LogFile.cpp
+// added declaration to Copter.h
+void Copter::Log_Write_ScalarMag(AP_ScalarMag &sm, uint64_t time_us)
+// was void Copter::Log_Write_ScalarMag(AP_ScalarMag &scalarMag, uint64_t time_us)
+{
+    if (time_us == 0) {
+        time_us = AP_HAL::micros64();
+    }
+    //uint32_t magData = scalarMag.getMagData();
+    //uint16_t signalStrength = scalarMag.getSignalStrength();
+    //uint32_t cycleCounter = scalarMag.getCycleCounter();
+    struct log_SCALARMAG pkt = {
+        LOG_PACKET_HEADER_INIT(LOG_SCALARMAG_MSG),
+        time_us       : time_us,
+        rawMagData      : { },
+        magData         : sm.getMagData(),
+        signalStrength  : sm.getSignalStrength(),
+        cycleCounter    : sm.getCycleCounter(),
+        /* was
+        magData         : scalarMag.getMagData(),
+        signalStrength  : scalarMag.getSignalStrength(),
+        cycleCounter    : scalarMag.getCycleCounter(),
+        */
+    };
+    // example init is from log_message
+    strncpy(pkt.rawMagData, sm.tfmSensor.rawMagData, sizeof(pkt.rawMagData));
+    // was strncpy(pkt.rawMagData, scalarMag.tfmSensor.rawMagData, sizeof(pkt.rawMagData));
+    DataFlash.WriteBlock(&pkt, sizeof(pkt));
+    // was WriteBlock(&pkt, sizeof(pkt));
+}
 
 
 /*
@@ -84,7 +118,7 @@ void Copter::scalarMagTask()
             // echo bytes over radio link
             hal.uartC->write(dataByte);
             if (dataByte == '\n') {
-                Log_Write_ScalarMag();
+                Log_Write_ScalarMag(scalarMag,0);
                 break;
             }
         }

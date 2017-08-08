@@ -9,6 +9,7 @@ LIBRARIES += AP_SerialManager
 LIBRARIES += AP_GPS
 LIBRARIES += DataFlash
 LIBRARIES += AP_Baro
+LIBRARIES += AP_ScalarMag
 LIBRARIES += AP_Compass
 LIBRARIES += AP_Math
 LIBRARIES += AP_InertialSensor
