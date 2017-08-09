@@ -5,6 +5,7 @@
 
 // moved this to Copter.h so it has scope in Copter class for UserHook init
 //AP_ScalarMag scalarMag;
+//Packet pkt;
 
 /* JJW // Write a ScalarMag packet
 static void Log_Write_ScalarMag()
@@ -28,7 +29,7 @@ void Copter::Log_Write_ScalarMag(AP_ScalarMag &sm, uint64_t time_us)
     if (time_us == 0) {
         time_us = AP_HAL::micros64();
     }
-    struct log_SCALARMAG pkt = {
+    struct log_SCALARMAG logpkt = {
         LOG_PACKET_HEADER_INIT(LOG_SCALARMAG_MSG),
         time_us       : time_us,
         rawMagData      : { },
@@ -41,11 +42,11 @@ void Copter::Log_Write_ScalarMag(AP_ScalarMag &sm, uint64_t time_us)
         cycleCounter    : scalarMag.getCycleCounter(),
         */
     };
-    // example init is from log_message
-    strncpy(pkt.rawMagData, sm.tfmSensor.rawMagData, sizeof(pkt.rawMagData));
+    strncpy((char *)logpkt.rawMagData, (char *)sm.tfmSensor.rawMagDataPtr, sm.tfmSensor.rawMagDataSize);
+    // was strncpy((char *)logpkt.rawMagData, (char *)sm.tfmSensor.rawMagData, sizeof(logpkt.rawMagData));
     // was strncpy(pkt.rawMagData, scalarMag.tfmSensor.rawMagData, sizeof(pkt.rawMagData));
-    DataFlash.WriteBlock(&pkt, sizeof(pkt));
-    // was WriteBlock(&pkt, sizeof(pkt));
+    DataFlash.WriteBlock(&logpkt, sizeof(logpkt));
+    // was WriteBlock(&logpkt, sizeof(logpkt));
 }
 
 
@@ -94,6 +95,7 @@ void Copter::userhook_init()
     UserCount=0;
 
     // JJW
+    pkt.pktInit();
     scalarMag.init();
     bFirstTime = true;
     hal.console->printf("\r\n>>scalarMag.init()-- DONE\r\n ");  // to MP Terminal
@@ -104,29 +106,89 @@ void Copter::scalarMagTask()
 {
     if (bFirstTime) {
         bFirstTime = false;
-        while (hal.uartE->available()) { hal.uartE->read();}  // clears Rx buffer
+        while (hal.uartE->available()) { hal.uartE->read();}  // clears Rx buffer at startup
+        hal.console->printf("\r\n>>Serial Rx cleared -- DONE\r\n ");  // to MP Terminal
         return;
     }
-    // read bytes from scalarMag on PixHawk
+
+    //uint8_t dataByte = 0;
+//////////////////////////////////////////////////
+    //char buffer[1024];      // CHECK THIS--DO WE NEED SOMETHING OF THIS SIZE?
+    //char * packetAllButHeader;
+    //char packetHeader;
+    //int bytes;
+    uint16_t i;
+
+    hal.uartE->write('U');  // DEBUG write a sentinel, monitor on scope
+    while (!pkt.serIsRxEmpty()) { // this checks the ring buffer
+        // parsing...;
+        if (pkt.parseMessage()) {   // run tskPktMgr() and pktReceive()
+            //Log.i(TAG, " " + pkt.Header);
+            // we have a packet
+            pkt.bPktReceived = false;
+            if (pkt.Header == '!') {
+                if (pkt.sizeAllButHeader <= 50) {  // guard against errors causing packet corruption (but error could have occurred earlier in pkt and crashed)
+                    scalarMag.tfmSensor.rawMagDataSize = pkt.sizeAllButHeader;
+                    scalarMag.tfmSensor.rawMagDataPtr =  (uint8_t *)(&pkt.AllButHeader);
+                    // time the log write
+                    //hal.uartE->write('U');  // DEBUG write a sentinel, monitor on scope
+                    Log_Write_ScalarMag(scalarMag, 0);
+                    //hal.uartE->write('U');  // DEBUG write a sentinel, monitor on scope
+                }
+                hal.console->printf("\r\n>>Rx packet size %d ", pkt.sizeAllButHeader);  // to MP Terminal
+            }
+            // I don't think we need to transfer the received packet into another buffer, just log it.
+            //for (i = 0; i < pkt.AllButHeader.length && pkt.AllButHeader[i] != 0; i++) {
+            //} // nothing to do, we're just finding the position of the null-terminator
+            //packetAllButHeader = Arrays.copyOfRange(pkt.AllButHeader, 0, i);
+            //packetHeader = pkt.Header;
+            //// Send the obtained bytes to the UI Activity
+            ////mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, buffer.clone()).sendToTarget();
+            //// Send the obtained bytes to the UI Activity
+            ////mHandler.obtainMessage(Constants.MESSAGE_READ, packetHeader, i, packetAllButHeader).sendToTarget();
+        }
+    }
+    // Read from the uart and enqueue anything received
+    // here, want toread a char and enQ it, look into details and see what's most efficient.
+    // this part copies Rx chars into a byte array and then enQs the array.
+    ///////
+    // probably better to do uart.read and then serPutCHar
+    ////////
+    // read bytes from scalarMag
     // scalarMag::read()
     uint32_t nBytes = hal.uartE->available();
-    uint8_t dataByte = 0;
-    // WARNING! This section must be refactored to parse the incoming data stream.
+    if (nBytes > 0) {
+        for (i=0; i<nBytes; i++) {
+            // @TODO more efficient to read all chars into an array, and then add the array using enqChars
+            // saves call to serPutRxChar() for each character
+            pkt.serPutRxChar((uint8_t)hal.uartE->read());   // enqueues the received bytes
+        }
+    }
+    hal.uartE->write('P');  // 0x50 DEBUG write a sentinel, monitor on scope
+
+    /////////////////////////////////////////////////
+    /*
+    // Replaced with above section to parse the incoming data stream.
     if ((nBytes>0) && (nBytes<64)) {  // WARNING- Fails if we got a partial packet?
         hal.uartE->write('U');  // DEBUG write a sentinel, monitor on scope
         for (uint32_t i=0; i<nBytes; i++) {
             dataByte = (uint8_t)hal.uartE->read();
-            scalarMag.tfmSensor.rawMagData[i] = dataByte;
+            // no longer valid--do not use scalarMag.tfmSensor.rawMagData[i] = dataByte;
             receivedBytes[i] = dataByte;
             // echo bytes over radio link
             hal.uartC->write(dataByte); // uartC is TELEM1
             if (dataByte == '\n') {
+                hal.console->printf("\r\n>> ");  // to MP Terminal
+                hal.console->write(scalarMag.tfmSensor.rawMagData,nBytes);
+                ///////////////////////////////////
                 Log_Write_ScalarMag(scalarMag,0);
+                ////////////////////////////////////
                 break;
             }
         }
     }
-    hal.console->printf("\r\n>>ScalarMag read %d bytes\r\n ", nBytes);  // to MP Terminal
+    */
+    //hal.console->printf("\r\n>>ScalarMag read %d bytes\r\n ", nBytes);  // to MP Terminal
     //hal.console->printf("\r\n>>ScalarMag count %d\r\n ", UserCount++);  // to MP Terminal
     //test_uart(hal.uartD, "uartD");  // telem2 is 915MHz radio to base at 57600
 }
@@ -175,6 +237,6 @@ void Copter::userhook_SlowLoop()
 void Copter::userhook_SuperSlowLoop()
 {
     // put your 1Hz code here
-    //hal.console->printf("\r\n>>ScalarMag (userhook) count %d\r\n ", UserCount++);  // to MP Terminal
+    hal.console->printf("\r\n>>ScalarMag count %d\r\n ", UserCount++);  // to MP Terminal
 }
 #endif

@@ -198,7 +198,7 @@ struct PACKED log_BARO {
 struct PACKED log_SCALARMAG {
     LOG_PACKET_HEADER;
     uint64_t time_us;
-    char     rawMagData[64];
+    uint8_t  rawMagData[64];
     uint32_t magData;
     uint16_t signalStrength;
     uint32_t cycleCounter;
