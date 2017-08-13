@@ -203,7 +203,7 @@ private:
     AP_Baro barometer;
     // JJW added
     AP_ScalarMag scalarMag;
-    Packet      pkt;
+    //Packet      pktMag;
     //
     Compass compass;
     AP_InertialSensor ins;
