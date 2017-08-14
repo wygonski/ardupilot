@@ -676,6 +676,12 @@ void Copter::userhook_init()
 
 void Copter::scalarMagTask()
 {
+    char    chMagData[12];
+    char    chSignalStrength[12];
+    char    cycleCounter[12];
+    char    *pHdr;
+    int         charCount;
+
     if (bFirstTime) {
         bFirstTime = false;
         while (hal.uartE->available()) { hal.uartE->read();}  // clears Rx buffer at startup
@@ -690,6 +696,9 @@ void Copter::scalarMagTask()
     //char packetHeader;
     //int bytes;
     uint16_t i;
+    uint8_t h1 = '!'; // char
+    uint8_t h2 = '@'; // char
+    uint8_t h3 = '^'; // char
 
     hal.uartE->write('U');  // DEBUG write a sentinel, monitor on scope
     while (! serIsRxEmpty()) { // this checks the ring buffer
@@ -703,6 +712,16 @@ void Copter::scalarMagTask()
                     scalarMag.tfmSensor.rawMagDataSize =  sizeAllButHeader;
                     for (i=0; i< sizeAllButHeader; i++)  {
                         scalarMag.tfmSensor.rawMagData[i] =  AllButHeader[i];
+                    }
+                    // array AllButHeader() now contains <magData>@<signalStrength>^<cycleCounter>\0
+                    pHdr = strchr(AllButHeader, (int)h2); // find the end of <magData>
+                    if (pHdr != NULL) {
+                        memcpy(chMagData, AllButHeader, pHdr - AllButHeader );
+                        //@TODO this is likely slow as atoi, so find the fast version in your Android code
+                        sscanf(chMagData, "%d", &scalarMag.tfmSensor.magData);
+                    }
+                    else {
+                        chMagData[0] = '\0';
                     }
                     // do not use scalarMag.tfmSensor.rawMagDataPtr =  (uint8_t *)(&pktMag.AllButHeader);
                     // time the log write
