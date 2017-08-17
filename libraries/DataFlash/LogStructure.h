@@ -878,8 +878,8 @@ struct PACKED log_Beacon {
 
 // JJW added
 // see "struct sensor" in AP_ScalarMag.h and "Log_Write_ScalarMag":
-#define SCALARMAG_LABELS "TimeUS,rawMagData,MagData,SignalStrength,DspCycleCount,Roll,Pitch,Yaw"
-#define SCALARMAG_FMT   "QZIIIccC"
+#define SCALARMAG_LABELS "TimeUS,rawMagData,MagData,SignalStr,CycleCount,Roll,Pitch,Yaw"
+#define SCALARMAG_FMT   "QZIHIccC"
 // Later we can replace (or keep) raw !<p1>#<p2>^<p3>CRLF string with uint32_t, uint32_t, uint32_t when we put in parsing of string
 // early version #define SCALARMAG_LABELS "TimeUS,stringMagData,Roll,Pitch,Yaw"
 // early version #define SCALARMAG_FMT   "QZccC"
