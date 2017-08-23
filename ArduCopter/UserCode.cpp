@@ -598,9 +598,12 @@ static void Log_Write_ScalarMag()
 void Copter::Log_Write_ScalarMag(AP_ScalarMag &sm, uint64_t time_us)
 // was void Copter::Log_Write_ScalarMag(AP_ScalarMag &scalarMag, uint64_t time_us)
 {
+    Location loc;
+
     if (time_us == 0) {
-        time_us = AP_HAL::micros64();
+        time_us = AP_HAL::micros64();   // @TODO we want GPS time--this is uC clock ticks?
     }
+    ahrs.get_position(loc);
     struct log_SCALARMAG logpkt = {
         LOG_PACKET_HEADER_INIT(LOG_SCALARMAG_MSG),
         time_us       : time_us,
@@ -608,12 +611,19 @@ void Copter::Log_Write_ScalarMag(AP_ScalarMag &sm, uint64_t time_us)
         magData         : sm.getMagData(),
         signalStrength  : sm.getSignalStrength(),
         cycleCounter    : sm.getCycleCounter(),
-        /* was
-        magData         : scalarMag.getMagData(),
-        signalStrength  : scalarMag.getSignalStrength(),
-        cycleCounter    : scalarMag.getCycleCounter(),
+        /* initializers
+        roll             ,
+        pitch            ,
+        yaw              ,
+        latitude         ,
+        longitude        ,
         */
     };
+    logpkt.roll = 100;
+    logpkt.pitch = 200;
+    logpkt.yaw = 300;
+    logpkt.latitude =40;
+    logpkt.longitude = 5;
     //strncpy((char *)logpkt.rawMagData, (char *)sm.tfmSensor.rawMagDataPtr, sm.tfmSensor.rawMagDataSize);
     strncpy((char *)logpkt.rawMagData, (char *)sm.tfmSensor.rawMagData, sm.tfmSensor.rawMagDataSize);
     // was strncpy(logpkt.rawMagData, scalarMag.tfmSensor.rawMagData, sizeof( rawMagData));
