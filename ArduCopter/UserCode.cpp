@@ -680,7 +680,7 @@ void Copter::scalarMagTask()
     char    chSignalStrength[12];
     char    cycleCounter[12];
     char    *pHdr;
-    int         charCount;
+    int     charCount;
 
     if (bFirstTime) {
         bFirstTime = false;
@@ -699,6 +699,7 @@ void Copter::scalarMagTask()
     uint8_t h1 = '!'; // char
     uint8_t h2 = '@'; // char
     uint8_t h3 = '^'; // char
+    int numConverted;
 
     hal.uartE->write('U');  // DEBUG write a sentinel, monitor on scope
     while (! serIsRxEmpty()) { // this checks the ring buffer
@@ -714,6 +715,37 @@ void Copter::scalarMagTask()
                         scalarMag.tfmSensor.rawMagData[i] =  AllButHeader[i];
                     }
                     // array AllButHeader() now contains <magData>@<signalStrength>^<cycleCounter>\0
+                    //                       or contains <magData>@<signalStrength>\0
+#if 1   // attempt to parse all data values using sscanf calls...
+        /*  NOTE: using any of the scanf will probably be SLOWER than just looping over your buffers to extract strings of
+         *      characters [A-Za-z]. This is because, with any of the scanf functions, the code first needs to parse
+         *      your format string to figure out what you're looking for, and then actually parse the input.
+         */
+                    pHdr = NULL;
+                    pHdr = strchr(AllButHeader, (int)h3);
+                    if (pHdr != NULL) { // string contains <magData>@<signalStrength>^<cycleCounter>\0
+                        numConverted = sscanf( AllButHeader, "%s@%s^%d", chMagData, chSignalStrength, &scalarMag.tfmSensor.cycleCount ) ;  // last one is already terminated with '\0' so convert directly
+                        // was numConverted = sscanf( AllButHeader, "%[^@]@%[^^]^%d", chMagData, chSignalStrength, &scalarMag.tfmSensor.cycleCount ) ;  // last one is already terminated with '\0' so convert directly
+                        if (numConverted == 3) {
+                            sscanf(chMagData, "%d", &scalarMag.tfmSensor.magData);
+                            sscanf(chSignalStrength, "%hd", &scalarMag.tfmSensor.signalStrength);   // crucial to use %hd in sscanf for int16_t of SignalStrength
+                            hal.console->printf("\r\n>> %d %hd %d \r\n ", scalarMag.tfmSensor.magData, scalarMag.tfmSensor.signalStrength, scalarMag.tfmSensor.cycleCount);  // to MP Terminal
+                        }
+                        else {
+                            hal.console->printf("\r\n>>FAIL-converted %d of 3 values in %s\r\n ", numConverted, AllButHeader );  // to MP Terminal
+                        }
+                    }
+                    else { // string contains <magData>@<signalStrength>\0
+                        numConverted = sscanf( AllButHeader, "%[^@]@%hd", chMagData, &scalarMag.tfmSensor.signalStrength ) ;  // last one is already terminated with '\0' so convert directly
+                        if (numConverted == 2) {
+                            sscanf(chMagData, "%d", &scalarMag.tfmSensor.magData);
+                            hal.console->printf("\r\n>> %d %d \r\n ", scalarMag.tfmSensor.magData, scalarMag.tfmSensor.signalStrength);  // to MP Terminal
+                        }
+                        else {
+                            hal.console->printf("\r\n>>FAIL - only converted %d of 2 values\r\n ", numConverted );  // to MP Terminal
+                        }
+                    }
+#else
                     pHdr = strchr(AllButHeader, (int)h2); // find the end of <magData>
                     if (pHdr != NULL) {
                         memcpy(chMagData, AllButHeader, pHdr - AllButHeader );
@@ -723,12 +755,13 @@ void Copter::scalarMagTask()
                     else {
                         chMagData[0] = '\0';
                     }
+#endif
                     // do not use scalarMag.tfmSensor.rawMagDataPtr =  (uint8_t *)(&pktMag.AllButHeader);
                     // time the log write
                     //hal.uartE->write('U');  // DEBUG write a sentinel, monitor on scope
                     Log_Write_ScalarMag(scalarMag, 0);
-                    hal.uartE->write('U');  // DEBUG write a sentinel, monitor on scope
-                }
+                    hal.uartE->write('P');  // 0x50 DEBUG write a sentinel, monitor on scope
+              }
                 hal.console->printf("\r\n>>Rx packet size %d ",  sizeAllButHeader);  // to MP Terminal
             }
             // I don't think we need to transfer the received packet into another buffer, just log it.
@@ -758,7 +791,7 @@ void Copter::scalarMagTask()
              serPutRxChar((uint8_t)hal.uartE->read());   // enqueues the received bytes
         }
     }
-    hal.uartE->write('P');  // 0x50 DEBUG write a sentinel, monitor on scope
+//    hal.uartE->write('P');  // 0x50 DEBUG write a sentinel, monitor on scope
 
     /////////////////////////////////////////////////
     /*
