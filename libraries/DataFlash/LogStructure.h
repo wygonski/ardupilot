@@ -202,11 +202,13 @@ struct PACKED log_SCALARMAG {
     uint32_t magData;
     uint16_t signalStrength;
     uint32_t cycleCounter;
+    /*
     int16_t roll;
     int16_t pitch;
     uint16_t yaw;
     int32_t latitude;
     int32_t longitude;
+    */
 };
 
 struct PACKED log_AHRS {
@@ -880,11 +882,11 @@ struct PACKED log_Beacon {
 
 // JJW added
 // see "struct sensor" in AP_ScalarMag.h and "Log_Write_ScalarMag":
-#define SCALARMAG_LABELS "TimeUS,rawMagDat,MagDat,SgnlStr,CycleCount,Rl,Pt,Yw,Lat,Lng"
-#define SCALARMAG_FMT   "QZIHIccCLL"
-// Later we can replace (or keep) raw !<p1>#<p2>^<p3>CRLF string with uint32_t, uint32_t, uint32_t when we put in parsing of string
-// early version #define SCALARMAG_LABELS "TimeUS,stringMagData,Roll,Pitch,Yaw"
-// early version #define SCALARMAG_FMT   "QZccC"
+#define SCALARMAG_LABELS "TimeUS,rawMagData,MagData,SignalStrength,CycleCount"
+#define SCALARMAG_FMT   "QZIHI"
+//removed other sensor values because they are saved by other logs with time_us
+//#define SCALARMAG_LABELS "TimeUS,rawMagDat,MagDat,SgnlStr,CycleCount,Rl,Pt,Yw,Lat,Lng"
+//#define SCALARMAG_FMT   "QZIHIccCLL"
 // end
 
 #define ESC_LABELS "TimeUS,RPM,Volt,Curr,Temp"

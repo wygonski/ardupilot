@@ -611,19 +611,7 @@ void Copter::Log_Write_ScalarMag(AP_ScalarMag &sm, uint64_t time_us)
         magData         : sm.getMagData(),
         signalStrength  : sm.getSignalStrength(),
         cycleCounter    : sm.getCycleCounter(),
-        /* initializers
-        roll             ,
-        pitch            ,
-        yaw              ,
-        latitude         ,
-        longitude        ,
-        */
     };
-    logpkt.roll = 100;
-    logpkt.pitch = 200;
-    logpkt.yaw = 300;
-    logpkt.latitude =40;
-    logpkt.longitude = 5;
     //strncpy((char *)logpkt.rawMagData, (char *)sm.tfmSensor.rawMagDataPtr, sm.tfmSensor.rawMagDataSize);
     strncpy((char *)logpkt.rawMagData, (char *)sm.tfmSensor.rawMagData, sm.tfmSensor.rawMagDataSize);
     // was strncpy(logpkt.rawMagData, scalarMag.tfmSensor.rawMagData, sizeof( rawMagData));
@@ -746,13 +734,14 @@ void Copter::scalarMagTask()
                         }
                     }
                     else { // string contains <magData>@<signalStrength>\0
-                        numConverted = sscanf( AllButHeader, "%[^@]@%hd", chMagData, &scalarMag.tfmSensor.signalStrength ) ;  // last one is already terminated with '\0' so convert directly
+                        numConverted = sscanf( AllButHeader, "%s@%hd", chMagData, &scalarMag.tfmSensor.signalStrength ) ;  // last one is already terminated with '\0' so convert directly
+                        // was, didn't work: numConverted = sscanf( AllButHeader, "%[^@]@%hd", chMagData, &scalarMag.tfmSensor.signalStrength ) ;  // last one is already terminated with '\0' so convert directly
                         if (numConverted == 2) {
                             sscanf(chMagData, "%d", &scalarMag.tfmSensor.magData);
-                            hal.console->printf("\r\n>> %d %d \r\n ", scalarMag.tfmSensor.magData, scalarMag.tfmSensor.signalStrength);  // to MP Terminal
+                            //hal.console->printf("\r\n>> %d %d \r\n ", scalarMag.tfmSensor.magData, scalarMag.tfmSensor.signalStrength);  // to MP Terminal
                         }
                         else {
-                            hal.console->printf("\r\n>>FAIL - only converted %d of 2 values\r\n ", numConverted );  // to MP Terminal
+                            //hal.console->printf("\r\n>>FAIL - only converted %d of 2 values\r\n ", numConverted );  // to MP Terminal
                         }
                     }
 #else
