@@ -761,7 +761,7 @@ void Copter::scalarMagTask()
                     Log_Write_ScalarMag(scalarMag, 0);
                     hal.uartE->write('P');  // 0x50 DEBUG write a sentinel, monitor on scope
               }
-                hal.console->printf("\r\n>>Rx packet size %d ",  sizeAllButHeader);  // to MP Terminal
+                //hal.console->printf("\r\n>>Rx packet size %d ",  sizeAllButHeader);  // to MP Terminal
             }
             // I don't think we need to transfer the received packet into another buffer, just log it.
             //for (i = 0; i < pktMag.AllButHeader.length && pktMag.AllButHeader[i] != 0; i++) {
