@@ -119,7 +119,8 @@ public:
     uint32_t getMagData(void) const { return tfmSensor.magData; }
 
     // range 0-100
-    uint16_t getSignalStrength(void) const {return tfmSensor.signalStrength;}
+    // was uint16_t getSignalStrength(void) const {return tfmSensor.signalStrength;}
+    uint32_t getSignalStrength(void) const {return tfmSensor.signalStrength;}
 
     // value increases by 1 for each packet received from TFM.  Useful to detect if packets were dropped
     uint32_t getCycleCounter(void) const { return tfmSensor.cycleCount; }
@@ -172,7 +173,7 @@ public:
     struct sensor {
         uint8_t     rawMagData[64];
         uint32_t    magData;         // convert to nT
-        uint16_t    signalStrength;  // range 0-100
+        uint32_t    signalStrength;  // range 0-100
         uint32_t    cycleCount;      // increasing counter
         uint8_t     *rawMagDataPtr;  // points to the array of received chars
         uint32_t    rawMagDataSize;

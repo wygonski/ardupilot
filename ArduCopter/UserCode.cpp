@@ -14,7 +14,7 @@
 #define PKT_TX_HEADER  '~'
 #define DATA_RX_HEADER  '!'     // data stream should be handled with expedience
 
-// @TODO Changed the Ring buffer sizes from 32 to 256 and the appinfo commands now work, figure out why:
+// TODO Changed the Ring buffer sizes from 32 to 256 and the appinfo commands now work, figure out why:
         // because "~asn\r\n$asnquspin9999, offset 3275\r\n" is 35 chars, so you need a bigger ring buffer or it will miss chars
 #define SER_RX_BUF_SIZE  256
 #define SER_TX_BUF_SIZE  256
@@ -607,14 +607,13 @@ void Copter::Log_Write_ScalarMag(AP_ScalarMag &sm, uint64_t time_us)
     struct log_SCALARMAG logpkt = {
         LOG_PACKET_HEADER_INIT(LOG_SCALARMAG_MSG),
         time_us       : time_us,
-        rawMagData      : { },
+//        rawMagData      : { },
         magData         : sm.getMagData(),
         signalStrength  : sm.getSignalStrength(),
         cycleCounter    : sm.getCycleCounter(),
     };
-    //strncpy((char *)logpkt.rawMagData, (char *)sm.tfmSensor.rawMagDataPtr, sm.tfmSensor.rawMagDataSize);
-    strncpy((char *)logpkt.rawMagData, (char *)sm.tfmSensor.rawMagData, sm.tfmSensor.rawMagDataSize);
-    // was strncpy(logpkt.rawMagData, scalarMag.tfmSensor.rawMagData, sizeof( rawMagData));
+    /* JJW removed writing the raw string to dataflash
+    strncpy((char *)logpkt.rawMagData, (char *)sm.tfmSensor.rawMagData, sm.tfmSensor.rawMagDataSize); */
     DataFlash.WriteBlock(&logpkt, sizeof(logpkt));
     // was WriteBlock(&logpkt, sizeof(logpkt));
 }
@@ -758,7 +757,7 @@ void Copter::scalarMagTask()
                     // do not use scalarMag.tfmSensor.rawMagDataPtr =  (uint8_t *)(&pktMag.AllButHeader);
                     // time the log write
                     //hal.uartE->write('U');  // DEBUG write a sentinel, monitor on scope
-                    Log_Write_ScalarMag(scalarMag, 0);
+                    Log_Write_ScalarMag(scalarMag, 0); /* TODO Call Log_Write_ScalarMAg() with time_usvalue obtained here, otherwise you'll be timestamping it witht he time of writeing to flash */
                     hal.uartE->write('P');  // 0x50 DEBUG write a sentinel, monitor on scope
               }
                 //hal.console->printf("\r\n>>Rx packet size %d ",  sizeAllButHeader);  // to MP Terminal

@@ -198,9 +198,9 @@ struct PACKED log_BARO {
 struct PACKED log_SCALARMAG {
     LOG_PACKET_HEADER;
     uint64_t time_us;
-    uint8_t  rawMagData[64];
+/*    uint8_t  rawMagData[64]; */
     uint32_t magData;
-    uint16_t signalStrength;
+    uint32_t signalStrength;
     uint32_t cycleCounter;
     /*
     int16_t roll;
@@ -882,8 +882,12 @@ struct PACKED log_Beacon {
 
 // JJW added
 // see "struct sensor" in AP_ScalarMag.h and "Log_Write_ScalarMag":
+#define SCALARMAG_LABELS "TimeUS,MagData,SignalStrength,CycleCount"
+#define SCALARMAG_FMT   "QIII"
+/* was
 #define SCALARMAG_LABELS "TimeUS,rawMagData,MagData,SignalStrength,CycleCount"
 #define SCALARMAG_FMT   "QZIHI"
+*/
 //removed other sensor values because they are saved by other logs with time_us
 //#define SCALARMAG_LABELS "TimeUS,rawMagDat,MagDat,SgnlStr,CycleCount,Rl,Pt,Yw,Lat,Lng"
 //#define SCALARMAG_FMT   "QZIHIccCLL"
