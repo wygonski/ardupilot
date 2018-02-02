@@ -721,20 +721,22 @@ void Copter::scalarMagTask()
                     pHdr = NULL;
                     pHdr = strchr(AllButHeader, (int)h3);
                     if (pHdr != NULL) { // string contains <magData>@<signalStrength>^<cycleCounter>\0
-                        numConverted = sscanf( AllButHeader, "%s@%s^%d", chMagData, chSignalStrength, &scalarMag.tfmSensor.cycleCount ) ;  // last one is already terminated with '\0' so convert directly
-                        // was numConverted = sscanf( AllButHeader, "%[^@]@%[^^]^%d", chMagData, chSignalStrength, &scalarMag.tfmSensor.cycleCount ) ;  // last one is already terminated with '\0' so convert directly
+                        // numConverted = sscanf( AllButHeader, "%s@%s^%d", chMagData, chSignalStrength, &scalarMag.tfmSensor.cycleCount ) ;  // last one is already terminated with '\0' so convert directly
+                        // this worked in arduino codebase:
+                        numConverted = sscanf( AllButHeader, "%[^'@']%*c%[^'^']%*c%d", chMagData, chSignalStrength, &scalarMag.tfmSensor.cycleCount ) ;  // last one is already terminated with '\0' so convert directly
                         if (numConverted == 3) {
                             sscanf(chMagData, "%d", &scalarMag.tfmSensor.magData);
-                            sscanf(chSignalStrength, "%hd", &scalarMag.tfmSensor.signalStrength);   // crucial to use %hd in sscanf for int16_t of SignalStrength
+                            sscanf(chSignalStrength, "%d", &scalarMag.tfmSensor.signalStrength);
                             hal.console->printf("\r\n>> %d %hd %d \r\n ", scalarMag.tfmSensor.magData, scalarMag.tfmSensor.signalStrength, scalarMag.tfmSensor.cycleCount);  // to MP Terminal
+                            // was sscanf(chSignalStrength, "%hd", &scalarMag.tfmSensor.signalStrength);   // crucial to use %hd in sscanf for int16_t of SignalStrength
+                            // was hal.console->printf("\r\n>> %d %hd %d \r\n ", scalarMag.tfmSensor.magData, scalarMag.tfmSensor.signalStrength, scalarMag.tfmSensor.cycleCount);  // to MP Terminal
                         }
                         else {
                             hal.console->printf("\r\n>>FAIL-converted %d of 3 values in %s\r\n ", numConverted, AllButHeader );  // to MP Terminal
                         }
                     }
                     else { // string contains <magData>@<signalStrength>\0
-                        numConverted = sscanf( AllButHeader, "%s@%hd", chMagData, &scalarMag.tfmSensor.signalStrength ) ;  // last one is already terminated with '\0' so convert directly
-                        // was, didn't work: numConverted = sscanf( AllButHeader, "%[^@]@%hd", chMagData, &scalarMag.tfmSensor.signalStrength ) ;  // last one is already terminated with '\0' so convert directly
+                        numConverted = sscanf( AllButHeader, "%s@%d", chMagData, &scalarMag.tfmSensor.signalStrength ) ;  // last one is already terminated with '\0' so convert directly
                         if (numConverted == 2) {
                             sscanf(chMagData, "%d", &scalarMag.tfmSensor.magData);
                             //hal.console->printf("\r\n>> %d %d \r\n ", scalarMag.tfmSensor.magData, scalarMag.tfmSensor.signalStrength);  // to MP Terminal

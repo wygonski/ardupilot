@@ -414,7 +414,7 @@ void DataFlash_Class::Log_Write_Baro(AP_Baro &baro, uint64_t time_us)
     }
 }
 
-/* JJW implementation moved to UserCode.cpp
+/* JJW implementation moved to UserCode.cpp >>> WHY?
 // JJW Write a SCALARMAG packet
 void DataFlash_Class::Log_Write_ScalarMag(AP_ScalarMag &scalarMag, uint64_t time_us)
 {
